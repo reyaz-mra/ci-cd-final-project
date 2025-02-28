@@ -1,0 +1,24 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup-workspace
+spec:
+  description: This task will clean up a workspace by deleting all the files.
+  workspaces:
+    - name: shared-workspace
+  steps:
+    - name: cleanup
+      image: alpine:latest
+      env:
+        - name: WORKSPACE_PATH
+          value: "/workspace/shared-workspace"
+      workingDir: /workspace/shared-workspace
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      script: |
+        #!/bin/sh
+        echo "Cleaning up workspace..."
+        rm -rf $WORKSPACE_PATH/*
+        echo "Cleanup completed."
